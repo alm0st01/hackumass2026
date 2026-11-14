@@ -1,0 +1,4 @@
+pyserial
+meshtastic
+opencv-python
+ultralytics   # only for --vision person (YOLOv8)

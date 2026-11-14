@@ -6,3 +6,5 @@
 adi/search-and-rescue/
 
 adi/NOMAD/
+__pycache__/
+yolov8n.pt
