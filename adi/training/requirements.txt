@@ -1,0 +1,6 @@
+tensorflow==2.19.*
+tf2onnx>=1.16
+onnx
+onnxruntime
+pillow
+requests

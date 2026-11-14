@@ -1,0 +1,4 @@
+camera/build/
+training/.venv/
+model/model.keras
+__pycache__/
