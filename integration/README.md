@@ -17,6 +17,7 @@
 |---|---|---|---|
 | Robot main program | Raspberry Pi | `integration/pi/main.py` | |
 | Radio messages (Meshtastic) | Pi + laptop | `piku/meshtastic-testing/` | Piku |
+| Position in radio messages | Pi + laptop | `integration/pi/located_robot.py`, `integration/base_station.py` | |
 | Person / AprilTag detection | Pi | `integration/pi/vision.py` (same settings as `adi/person.py`, `adi/main.py`) | Adi |
 | Motor control + safety stops | ESP32 | `integration/firmware/main.cpp`, `alan/control/` | Alan |
 | Search patterns, position estimate | Pi | `integration/pi/planner.py`, `estimator.py`, `navigator.py` | |
@@ -122,6 +123,31 @@ Averages over 8 runs each:
 
 ![Simulated paths](docs/search_sim.png)
 
+### Position in radio messages
+
+The robot adds its estimated position to every `HEARTBEAT` (every 10 s) and `DETECTION`:
+
+| Field | Meaning |
+|---|---|
+| `x`, `y` | metres from the start point, x = east, y = north, 1 decimal |
+| `err` | 1-sigma position uncertainty in metres, 1 decimal |
+
+```
+{"type":"DETECTION","to":0,"conf":84,"box":[41,170,127,226],"from":1,"seq":5012,"needs_ack":true,"x":12.3,"y":30.1,"err":2.4}|<signature>
+```
+
+- A `DETECTION` carries the position at the moment the target was confirmed. Resends keep it.
+- The fields are covered by Piku's signature like everything else.
+- The largest message is about 170 bytes with worst-case values, under Meshtastic's limit of about 230.
+- `integration/base_station.py` shows them. Each alert line gets
+  `at x 12.3 m, y 30.1 m from the start (+-2.4 m)`, and `status` lists each robot's last position.
+
+This is done **without changing Piku's files**. `LocatedRobot` (in `located_robot.py`) extends
+Piku's `Robot` and adds the fields as messages go out. `base_station.py` extends Piku's `Base`
+to read them. Piku's `base.py` ignores fields it doesn't know, so it keeps working. If Piku
+would rather have the fields in his own code, `robot.py` needs 3 lines in its `HEARTBEAT` and
+`DETECTION` messages, and these two files can then be removed.
+
 ### Ways to correct the position without GPS (not implemented yet)
 
 - **An AprilTag at the base.** The robot already detects AprilTags. If it knows the tag sits at
@@ -218,7 +244,9 @@ ls -l /dev/serial/by-id/
 
 ## 3. Run
 
-On the laptop (Heltec plugged in): `python piku/meshtastic-testing/base.py --port <heltec port>`
+On the laptop (Heltec plugged in): `python integration/base_station.py --port <heltec port>`.
+This is Piku's `base.py` plus robot positions (see "Position in radio messages" below).
+Piku's own `base.py` also still works, but it doesn't show positions.
 
 On the Pi:
 
@@ -267,7 +295,7 @@ heading out.
 On one computer, in two terminals:
 
 ```sh
-python piku/meshtastic-testing/base.py --sim
+python integration/base_station.py --sim
 python integration/pi/main.py --sim-radio --sim --pattern sector --radius 5 --vision person --camera 0
 ```
 
@@ -295,15 +323,15 @@ All on a laptop. **Not yet on a real Pi, ESP32, or Heltec.**
   - The robot stopped and reported the person's position.
   - `resume 1` continued the pattern.
   - `home 1` drove it back to the start.
+- Positions over the radio: `base_station.py --sim` ↔ `main.py --sim`:
+  - The alert showed where the robot was when it found the person.
+  - `status` showed the latest position from the heartbeats.
+  - Piku's unmodified `base.py` still worked with the extra fields.
 - Not tested: the BNO055/MPU6050 drivers (no IMU here) and `calibrate.py` (no robot).
 
 ## Not done yet
 
 - **Real hardware.** Nothing above has run on the Pi, ESP32, Heltec, or an IMU yet.
-- **Position in the detection message.** The robot prints where it found the person, but
-  Piku's `DETECTION` message only carries the confidence and the camera box, so the base never
-  sees the position. Ask Piku to add `x`/`y` fields to `DETECTION` (about 15 bytes, well inside
-  the size limit), and `report_found()` in `main.py` can fill them in.
 - **Position corrections** from an AprilTag at the base, see above.
 - **Battery.** The heartbeat always reports 100%. Nothing measures it yet.
 - **Choosing the pattern from the base.** The pattern is set on the Pi's command line. Piku's

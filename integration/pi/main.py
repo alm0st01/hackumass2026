@@ -14,6 +14,9 @@ States (sent to the base in every heartbeat):
   RETURNING    after HOME: drives back to the start point, then STOPPED
   STOPPED      after STOP, or when back home
 
+Every HEARTBEAT and DETECTION also carries the estimated position (x, y, err), see
+located_robot.py. Use integration/base_station.py on the laptop to see it.
+
 Base commands: SCAN starts the pattern from the beginning, RESUME continues it where it left off.
 
 Examples:
@@ -30,9 +33,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "piku", "meshtastic-testing"))
 
 from common import MeshRadio, SimRadio  # noqa: E402  (Piku's code)
-from robot import Robot  # noqa: E402
 
 from estimator import PoseEstimator  # noqa: E402
+from located_robot import LocatedRobot  # noqa: E402  (Piku's Robot + x / y / err in messages)
 from motor_link import MotorLink  # noqa: E402
 from navigator import Navigator  # noqa: E402
 from planner import grid_search, path_length, radial_search, sector_search  # noqa: E402
@@ -183,6 +186,7 @@ class RobotBrain:
         if self.streak >= self.args.confirm_frames and self.state == "EXPLORING":
             self.remember_progress()
             self.nav.follow([])
+            self.update_position()  # the DETECTION carries the position at this moment
             self.found = (result.confidence, result.box)
             self.reported = False
             e = self.nav.estimator
@@ -197,6 +201,13 @@ class RobotBrain:
             if self.robot.send_detection(*self.found):
                 self.reported = True
                 self.say("detection sent to base")
+
+    def update_position(self):
+        """Copy the estimate into the robot, so the next HEARTBEAT / DETECTION carries it."""
+        e = self.nav.estimator
+        self.robot.x, self.robot.y = e.x, e.y
+        self.robot.position_err = e.position_sigma
+        self.robot.heading = int(round(e.heading_deg)) % 360
 
     # ------------------------------------------------------------------ driving
     def drive(self, now):
@@ -225,8 +236,8 @@ class RobotBrain:
             print("[motors] no STATUS from the ESP32 for 1 s; is it plugged in?")
         self.motor_link_ok = self.motors.connected
 
+        self.update_position()
         e = self.nav.estimator
-        self.robot.heading = int(round(e.heading_deg)) % 360  # goes out in the heartbeat
         if now - self.last_print >= STATUS_PRINT_S:
             self.last_print = now
             waypoint = ""
@@ -271,7 +282,7 @@ def main():
         if not args.radio_port:
             print("Warning: no --radio-port given. Meshtastic will guess, and it may pick the ESP32 instead of the Heltec.")
         radio = MeshRadio(args.radio_port)
-    robot = Robot(args.id, radio)
+    robot = LocatedRobot(args.id, radio)
 
     sim = None
     if args.sim:
