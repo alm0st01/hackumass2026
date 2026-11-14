@@ -1,5 +1,5 @@
 // IMU check: prints the heading while you turn the board by hand.
-//   pio run -e imu_test -t upload
+//   pio run -e imu_test -t upload      (regular ESP32; imu_test_s3 for the S3)
 //   pio device monitor
 #include <Arduino.h>
 #include <Wire.h>
