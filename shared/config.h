@@ -8,12 +8,24 @@ const uint8_t NUM_ROBOTS = 1;
 
 
 // Motor pins
+
+#ifdef BOARD_S3
+// ESP32-S3 dev board (temporary)
+const int PIN_LEFT_EN   = 4;
+const int PIN_LEFT_IN1  = 5;
+const int PIN_LEFT_IN2  = 6;
+const int PIN_RIGHT_EN  = 7;
+const int PIN_RIGHT_IN1 = 15;
+const int PIN_RIGHT_IN2 = 16;
+const int PIN_DISTANCE  = 1;
+#else
 const int PIN_LEFT_EN = 25;
 const int PIN_LEFT_IN1 = 26;
 const int PIN_LEFT_IN2 = 27;
 const int PIN_RIGHT_EN = 4;
 const int PIN_RIGHT_IN1 = 16;
-const int PIN_RIGHT_IN2 = 17; 
+const int PIN_RIGHT_IN2 = 17;
+#endif 
 
 // Sensor pins
 const int PIN_DISTANCE = 34;       // IR distance sensor (analog; must be GPIO 32-39)
