@@ -1,4 +1,7 @@
 pyserial
 meshtastic
 opencv-python
-ultralytics   # only for --vision person (YOLOv8)
+numpy
+smbus2         # IMU over I2C
+ultralytics    # only for --vision person (YOLOv8)
+matplotlib     # only for sim_search.py --plot
