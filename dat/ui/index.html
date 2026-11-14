@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Search Robot</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Mini Search Robot</h1>
+        <p>Robot Monitoring Dashboard</p>
+    </header>
+
+    <main class="dashboard">
+
+
+        <!-- Robot Status -->
+        <section class="card">
+            <h2>Robot Status</h2>
+
+            <p id="robot-status">IDLE</p>
+
+            <p id="connection-status">Disconnected</p>
+
+            <div class="connection-controls">
+                <button id="connect-btn">Connect</button>
+                <button id="disconnect-btn">Disconnect</button>
+            </div>
+        </section>
+
+
+        <!-- Camera Feed -->
+        <section class="card camera-card">
+            <h2>Camera Feed</h2>
+
+            <div class="camera">
+                <video id="camera-video" autoplay muted playsinline></video>
+
+                <div id="camera-placeholder">
+                    Camera feed will appear here
+                </div>
+
+                <span id="camera-status">OFFLINE</span>
+            </div>
+
+            <div class="camera-controls">
+                <button id="start-camera-btn">Start Camera</button>
+                <button id="stop-camera-btn">Stop Camera</button>
+            </div>
+        </section>
+        <!-- AprilTag Detection -->
+
+        <section class="card">
+            <h2>AprilTag Detection</h2>
+
+            <div class="detection-info">
+                <p>Status: <span id="detection-status">Not Detected</span></p>
+                <p>Tag ID: <span id="tag-id">--</span></p>
+                <p>Distance: <span id="tag-distance">--</span></p>
+            </div>
+
+            <button id="detect-btn">Simulate Detection</button>
+        </section>
+
+
+        <!-- Search Controls -->
+        <section class="card">
+            <h2>Search Controls</h2>
+            <button id="start-btn">Start Search</button>
+            <button id="stop-btn">Stop Search</button>
+        </section>
+
+        <!-- Activity Log -->
+        <section class="card">
+            <h2>Activity Log</h2>
+            <ul id="activity-log">
+                <li>Dashboard initialized.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
