@@ -1,0 +1,40 @@
+{
+  "name": "mini-search-robot-dashboard",
+  "version": "0.1.0",
+  "description": "Offline desktop dashboard for the mini search robots",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "edu.hackumass.minisearchrobot",
+    "productName": "Mini Search Robot",
+    "files": [
+      "main.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../ui",
+        "to": "ui"
+      }
+    ],
+    "mac": {
+      "target": "dmg",
+      "extendInfo": {
+        "NSCameraUsageDescription": "The dashboard uses the camera to detect AprilTags."
+      }
+    },
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
+  }
+}

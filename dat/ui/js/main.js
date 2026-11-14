@@ -93,40 +93,50 @@ const connectionStatus = document.getElementById("connection-status");
 let isConnected = false;
 
 
+function setConnected(connected) {
+    isConnected = connected;
+    connectionStatus.textContent = connected ? "Connected" : "Disconnected";
+    connectionStatus.style.color = connected ? "#22c55e" : "#ef4444";
+}
+// Lines received from the base station go to the Activity Log.
+robotLink.onLine = function (line) {
+    addLog("Robot: " + line);
+};
+// Port closed or unplugged.
+robotLink.onClose = function () {
+    if (isConnected) {
+        setConnected(false);
+        addLog("Robot disconnected.");
+    }
+};
 // Connect Robot
-connectButton.addEventListener("click", function () {
-
+connectButton.addEventListener("click", async function () {
     if (isConnected) {
         return;
     }
-
-    isConnected = true;
-
-    connectionStatus.textContent = "Connected";
-    connectionStatus.style.color = "#22c55e";
-
-    addLog("Robot connected.");
-
+    if (!robotLink.isSupported()) {
+        // Plain browser without Web Serial: keep the simulated connection.
+        setConnected(true);
+        addLog("Robot connected (simulated: serial not available).");
+        return;
+    }
+    try {
+        await robotLink.connect();
+        setConnected(true);
+        addLog("Robot connected over serial.");
+    } catch (error) {
+        addLog("Could not connect: " + error.message);
+    }
 });
-
-
 // Disconnect Robot
-disconnectButton.addEventListener("click", function () {
-
+disconnectButton.addEventListener("click", async function () {
     if (!isConnected) {
         return;
     }
-
-    isConnected = false;
-
-    connectionStatus.textContent = "Disconnected";
-    connectionStatus.style.color = "#ef4444";
-
+    setConnected(false);
+    await robotLink.disconnect();
     addLog("Robot disconnected.");
-
 });
-
-
 // Laptop Camera System
 const video = document.getElementById("camera-video");
 const placeholder = document.getElementById("camera-placeholder");
