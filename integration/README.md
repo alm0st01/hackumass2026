@@ -40,7 +40,7 @@ or a slow YOLO never delays the radio or the motor commands.
 `SCAN` starts the pattern from the beginning. `RESUME` continues it from where it stopped.
 The heartbeat now carries the estimated heading.
 
-A target counts as found after 5 frames in a row (`--confirm-frames`). The state goes out in
+A target counts as found using Adi's two-tier streak from `adi/yolo-and-tags/person.py`: a detection at 60%+ adds 2 points, 35–60% adds 1, a frame with nothing takes 1 off, and 10 points confirms it. The state goes out in
 every heartbeat, so `status` on the base shows it.
 
 **Safety is on the ESP32, not the Pi.** The ESP32 stops the motors if the Pi stops sending
@@ -244,7 +244,14 @@ ls -l /dev/serial/by-id/
 
 ## 3. Run
 
-On the laptop (Heltec plugged in): `python integration/base_station.py --port <heltec port>`.
+On the laptop (Heltec plugged in), **with the dashboard**:
+`python integration/dashboard_server.py --port <heltec port>`, then open **http://localhost:8000**.
+The page (Dat's `dat/ui`) shows each robot's state, battery and position on a map, a red banner
+and the target's box in the camera frame when one is found. Its buttons send SCAN / STOP /
+RESUME / HOME. The terminal commands still work too. Add `--host 0.0.0.0` to let other people on
+the same network open `http://<laptop IP>:8000`.
+
+Without the dashboard: `python integration/base_station.py --port <heltec port>`.
 This is Piku's `base.py` plus robot positions (see "Position in radio messages" below).
 Piku's own `base.py` also still works, but it doesn't show positions.
 
@@ -280,8 +287,9 @@ Then on the base, type `scan 1` to start the search, `stop 1` to stop, and `stat
 | `--vision` | `person` | `person` (YOLOv8n), `apriltag`, or `none` |
 | `--tag-id` | 0 | AprilTag ID for `--vision apriltag` |
 | `--camera` | 0 | camera index, or a video file |
-| `--min-confidence` | 0.6 | person detector threshold |
-| `--confirm-frames` | 5 | frames in a row needed for a detection |
+| `--min-confidence` | 0.35 | weak detection, +1 to the streak. Lower is ignored. |
+| `--high-confidence` | 0.6 | strong detection, +2 to the streak |
+| `--confirm-frames` | 10 | streak points needed to confirm. A miss takes 1 off. |
 | `--autostart` | off | start the search without waiting for `scan` |
 | `--no-obstacle-stop` | off | use when no distance sensor is wired up. An unconnected analog pin reads random values that can block forward driving. |
 | `--sim-radio` | | Piku's fake radio, instead of `--radio-port` |
@@ -295,11 +303,11 @@ heading out.
 On one computer, in two terminals:
 
 ```sh
-python integration/base_station.py --sim
+python integration/dashboard_server.py --sim   # then open http://localhost:8000
 python integration/pi/main.py --sim-radio --sim --pattern sector --radius 5 --vision person --camera 0
 ```
 
-Type `scan 1` in the base window and step in front of the camera.
+Click **Start Search** on the dashboard (or type `scan 1` in the base window) and step in front of the camera.
 
 ## Tested so far
 
@@ -336,7 +344,6 @@ All on a laptop. **Not yet on a real Pi, ESP32, or Heltec.**
 - **Battery.** The heartbeat always reports 100%. Nothing measures it yet.
 - **Choosing the pattern from the base.** The pattern is set on the Pi's command line. Piku's
   commands are only STOP / RESUME / HOME / SCAN.
-- **Dashboard.** `dat/ui` isn't connected. `base.py` is the base station for now.
 - **Speed on a Pi.** YOLOv8n at 320×320 hasn't been timed on a Pi 5 yet. If it's too slow, try
   `--vision apriltag`, which is much lighter.
 - `alan/search/planner.cpp` is still empty. The planner lives on the Pi in Python, so it isn't needed.

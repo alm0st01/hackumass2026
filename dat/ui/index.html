@@ -14,6 +14,12 @@
         <p>Robot Monitoring Dashboard</p>
     </header>
 
+    <!-- Shown when a robot finds the target; stays until dismissed -->
+    <div id="alert-banner" hidden>
+        <span id="alert-text"></span>
+        <button id="alert-dismiss">Dismiss</button>
+    </div>
+
     <main class="dashboard">
 
 
@@ -21,14 +27,49 @@
         <section class="card">
             <h2>Robot Status</h2>
 
-            <p id="robot-status">IDLE</p>
+            <select id="robot-select"></select>
 
-            <p id="connection-status">Disconnected</p>
+            <p id="robot-status">--</p>
+
+            <p id="robot-link">No robots yet</p>
+
+            <div class="detection-info">
+                <p>Battery: <span id="robot-battery">--</span></p>
+                <p>Position: <span id="robot-position">--</span></p>
+                <p>Heading: <span id="robot-heading">--</span></p>
+            </div>
+
+            <p>Base station: <span id="connection-status">Disconnected</span></p>
 
             <div class="connection-controls">
                 <button id="connect-btn">Connect</button>
                 <button id="disconnect-btn">Disconnect</button>
             </div>
+        </section>
+
+
+        <!-- Search Controls -->
+        <section class="card">
+            <h2>Search Controls</h2>
+            <button id="start-btn">Start Search</button>
+            <button id="stop-btn">Stop Search</button>
+            <div class="more-controls">
+                <button id="resume-btn">Resume</button>
+                <button id="home-btn">Return Home</button>
+            </div>
+        </section>
+
+
+        <!-- Map: robot positions (dead reckoning from the robot) and where targets were found -->
+        <section class="card map-card">
+            <h2>Map</h2>
+            <canvas id="map"></canvas>
+            <p class="map-legend">
+                <span class="legend-base">&#9632;</span> base (start point)
+                <span class="legend-robot">&#9679;</span> robot (circle = position uncertainty)
+                <span class="legend-person">&#10006;</span> target found
+                &nbsp;&middot;&nbsp; metres from the start, north is up
+            </p>
         </section>
 
 
@@ -70,13 +111,6 @@
             </div>
         </section>
 
-
-        <!-- Search Controls -->
-        <section class="card">
-            <h2>Search Controls</h2>
-            <button id="start-btn">Start Search</button>
-            <button id="stop-btn">Stop Search</button>
-        </section>
 
         <!-- Activity Log -->
         <section class="card">
