@@ -21,7 +21,7 @@ class Detection:
 
 
 class PersonDetector:
-    """YOLOv8 nano, person class only. Same model and settings as adi/person.py."""
+    """YOLOv8 nano, person class only. Same model and settings as vision/yolo-and-tags/person.py."""
 
     def __init__(self, weights="yolov8n.pt", min_confidence=0.6, img_size=320):
         from ultralytics import YOLO  # slow import, so only when used
@@ -43,7 +43,7 @@ class PersonDetector:
 
 
 class AprilTagDetector:
-    """Finds one AprilTag (36h11 family) by ID. Same settings as adi/main.py."""
+    """Finds one AprilTag (36h11 family) by ID. Same settings as vision/yolo-and-tags/april-tags.py."""
 
     def __init__(self, target_id=0):
         import cv2

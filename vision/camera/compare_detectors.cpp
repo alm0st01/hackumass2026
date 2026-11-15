@@ -2,7 +2,7 @@
 // people detector on labeled image folders, using the same preprocessing as
 // target_camera.cpp.
 //
-// Usage: compare_detectors --model adi/model/model.onnx [--threshold T] [--hog-upscale S]
+// Usage: compare_detectors --model vision/model/model.onnx [--threshold T] [--hog-upscale S]
 //                          <dataset folder> [<dataset folder> ...]
 // Each dataset folder must contain target/ and not_target/.
 //
@@ -77,7 +77,7 @@ bool hogFindsPerson(cv::HOGDescriptor& hog, const cv::Mat& frame, double upscale
 }  // namespace
 
 int main(int argc, char** argv) {
-    std::string modelPath = "adi/model/model.onnx";
+    std::string modelPath = "vision/model/model.onnx";
     float threshold = 0.5f;
     int imgSize = 224;
     double hogUpscale = 1.0;

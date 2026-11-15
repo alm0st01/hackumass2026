@@ -1,4 +1,4 @@
-"""Base station with the web dashboard (dat/ui): base_station.py plus live detections in a browser.
+"""Base station with the web dashboard (dashboard/ui): base_station.py plus live detections in a browser.
 
     python integration/dashboard_server.py --sim          (testing on one computer)
     python integration/dashboard_server.py --port COM5    (real radio: the base Heltec's port)
@@ -36,7 +36,7 @@ import base as piku_base  # noqa: E402  (Piku's code)
 from base import COMMANDS  # noqa: E402
 from common import MeshRadio, SimRadio  # noqa: E402
 
-UI_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dat", "ui"))
+UI_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dashboard", "ui"))
 KEEPALIVE_S = 15  # comment line sent this often so idle connections aren't dropped
 
 

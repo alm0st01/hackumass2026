@@ -4,7 +4,7 @@
               ROBOT                                                 BASE
  ┌─────────────────────────────────────────────┐
  │ Logitech camera ─USB─┐   BNO055 IMU ─I2C─┐  │
- │               Raspberry Pi 5: pi/main.py ─USB─ Heltec ~~LoRa~~ Heltec ─USB─ Laptop: piku/.../base.py
+ │               Raspberry Pi 5: pi/main.py ─USB─ Heltec ~~LoRa~~ Heltec ─USB─ Laptop: comms/.../base.py
  │                      │                      │
  │            USB serial│ DRIVE / STATUS        │
  │                      ▼                      │
@@ -16,10 +16,10 @@
 | Part | Runs on | Code | Owner |
 |---|---|---|---|
 | Robot main program | Raspberry Pi | `integration/pi/main.py` | |
-| Radio messages (Meshtastic) | Pi + laptop | `piku/meshtastic-testing/` | Piku |
+| Radio messages (Meshtastic) | Pi + laptop | `comms/meshtastic-testing/` | Piku |
 | Position in radio messages | Pi + laptop | `integration/pi/located_robot.py`, `integration/base_station.py` | |
-| Person / AprilTag detection | Pi | `integration/pi/vision.py` (same settings as `adi/person.py`, `adi/main.py`) | Adi |
-| Motor control + safety stops | ESP32 | `integration/firmware/main.cpp`, `alan/control/` | Alan |
+| Person / AprilTag detection | Pi | `integration/pi/vision.py` (same settings as `vision/yolo-and-tags/person.py`, `vision/yolo-and-tags/april-tags.py`) | Adi |
+| Motor control + safety stops | ESP32 | `integration/firmware/main.cpp`, `drive/control/` | Alan |
 | Search patterns, position estimate | Pi | `integration/pi/planner.py`, `estimator.py`, `navigator.py` | |
 | Pi ↔ ESP32 message format | | `shared/serial_protocol.md` | |
 
@@ -40,7 +40,7 @@ or a slow YOLO never delays the radio or the motor commands.
 `SCAN` starts the pattern from the beginning. `RESUME` continues it from where it stopped.
 The heartbeat now carries the estimated heading.
 
-A target counts as found using Adi's two-tier streak from `adi/yolo-and-tags/person.py`: a detection at 60%+ adds 2 points, 35–60% adds 1, a frame with nothing takes 1 off, and 10 points confirms it. The state goes out in
+A target counts as found using Adi's two-tier streak from `vision/yolo-and-tags/person.py`: a detection at 60%+ adds 2 points, 35–60% adds 1, a frame with nothing takes 1 off, and 10 points confirms it. The state goes out in
 every heartbeat, so `status` on the base shows it.
 
 **Safety is on the ESP32, not the Pi.** The ESP32 stops the motors if the Pi stops sending
@@ -191,7 +191,7 @@ is the safety timeout working.
    ```
 4. Enable I²C for the IMU: `sudo raspi-config` → Interface Options → I2C, then reboot.
    Check the IMU is seen with `i2cdetect -y 1`: a BNO055 shows up at `28`, an MPU6050 at `68`.
-5. Prepare the Heltec as in `piku/meshtastic-testing/README.md` (region, channel URL, and
+5. Prepare the Heltec as in `comms/meshtastic-testing/README.md` (region, channel URL, and
    `SECRET` in `common.py`, which must match the base).
 
 ### Wire and mount the IMU
@@ -246,7 +246,7 @@ ls -l /dev/serial/by-id/
 
 On the laptop (Heltec plugged in), **with the dashboard**:
 `python integration/dashboard_server.py --port <heltec port>`, then open **http://localhost:8000**.
-The page (Dat's `dat/ui`) shows each robot's state, battery and position on a map, a red banner
+The page (Dat's `dashboard/ui`) shows each robot's state, battery and position on a map, a red banner
 and the target's box in the camera frame when one is found. Its buttons send SCAN / STOP /
 RESUME / HOME. The terminal commands still work too. Add `--host 0.0.0.0` to let other people on
 the same network open `http://<laptop IP>:8000`.
@@ -346,4 +346,3 @@ All on a laptop. **Not yet on a real Pi, ESP32, or Heltec.**
   commands are only STOP / RESUME / HOME / SCAN.
 - **Speed on a Pi.** YOLOv8n at 320×320 hasn't been timed on a Pi 5 yet. If it's too slow, try
   `--vision apriltag`, which is much lighter.
-- `alan/search/planner.cpp` is still empty. The planner lives on the Pi in Python, so it isn't needed.

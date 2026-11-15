@@ -48,7 +48,7 @@ The old `RPi.GPIO` library does **not** work on a Pi 5.
 Prop the robot up so the wheels are off the ground.
 
 ```sh
-cd alan/pi
+cd drive/pi
 python motor_test.py              # 10 s forward at 200, 2 s stop, repeating; Ctrl+C stops
 python motor_test.py --speed 120
 python imu_test.py                # MPU6050 (or --imu bno055); turn it by hand
@@ -57,7 +57,7 @@ python imu_test.py                # MPU6050 (or --imu bno055); turn it by hand
 ## Tuning
 
 The constants at the top of `pi_motors.py` mean the same as in `shared/config.h` and
-`alan/control/motors.cpp` (`MOTOR_MIN_PWM`, `INVERT_LEFT`/`RIGHT`, `LEFT`/`RIGHT_MULTIPLIER`).
+`drive/control/motors.cpp` (`MOTOR_MIN_PWM`, `INVERT_LEFT`/`RIGHT`, `LEFT`/`RIGHT_MULTIPLIER`).
 If the team switches for good, tune them here instead.
 
 ## Difference from the ESP32

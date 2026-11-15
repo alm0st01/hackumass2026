@@ -1,5 +1,5 @@
 // Reads frames from a USB camera (e.g. Logitech webcam), runs the trained
-// target classifier (model.onnx from adi/training/train.py) on each frame, and
+// target classifier (model.onnx from vision/training/train.py) on each frame, and
 // reports when the target is found.
 //
 // Stdout prints one line per state change, for other programs to read:
@@ -9,7 +9,7 @@
 // Usage: target_camera [options]
 //   --camera N        camera index (default 0; a Logitech on a laptop is often 1)
 //   --source PATH     image or video file instead of a camera
-//   --model PATH      ONNX model (default adi/model/model.onnx)
+//   --model PATH      ONNX model (default vision/model/model.onnx)
 //   --info PATH       model_info.json (default: next to the model)
 //   --threshold T     override the threshold from model_info.json
 //   --smooth N        average the last N frames before deciding (default 5)
@@ -39,7 +39,7 @@ namespace {
 struct Options {
     int camera = 0;
     std::string source;
-    std::string model = "adi/model/model.onnx";
+    std::string model = "vision/model/model.onnx";
     std::string info;
     float threshold = -1.0f;  // < 0: use model_info.json
     int smooth = 5;

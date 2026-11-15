@@ -1,9 +1,9 @@
-// Laptop simulator for the drive-to-a-point controller (alan/control/drive).
+// Laptop simulator for the drive-to-a-point controller (drive/control/drive).
 // Fakes a two-wheeled robot and an overhead camera so the controller can be
 // tuned before the chassis exists.
 //
 // Build and run from the repo root:
-//   g++ -std=c++17 -Wall -I shared -I alan/control alan/control/drive.cpp alan/sim/drive_sim.cpp -o drive_sim && ./drive_sim
+//   g++ -std=c++17 -Wall -I shared -I drive/control drive/control/drive.cpp drive/sim/drive_sim.cpp -o drive_sim && ./drive_sim
 //   ./drive_sim -v    also prints a trace every 0.5 s
 
 #include <algorithm>

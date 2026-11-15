@@ -1,7 +1,7 @@
 """Main program for the robot's Raspberry Pi.
 
 Ties together:
-  - Piku's LoRa messaging (piku/meshtastic-testing/robot.py) for talking to the base station
+  - Piku's LoRa messaging (comms/meshtastic-testing/robot.py) for talking to the base station
   - a camera detector (vision.py) looking for a person or an AprilTag
   - a search pattern (planner.py) and position estimate (estimator.py: IMU heading + timed driving, no GPS)
   - the ESP32 motor controller over USB serial (motor_link.py, shared/serial_protocol.md)
@@ -30,7 +30,7 @@ import sys
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "piku", "meshtastic-testing"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "comms", "meshtastic-testing"))
 
 from common import MeshRadio, SimRadio  # noqa: E402  (Piku's code)
 
@@ -85,7 +85,7 @@ def parse_args():
     g.add_argument("--vision", choices=["person", "apriltag", "none"], default="person")
     g.add_argument("--tag-id", type=int, default=0, help="AprilTag ID to look for (--vision apriltag)")
     g.add_argument("--camera", default="0", help="camera index, or a video file for testing")
-    # Same two-tier confirmation as adi/yolo-and-tags/person.py
+    # Same two-tier confirmation as vision/yolo-and-tags/person.py
     g.add_argument("--min-confidence", type=float, default=0.35,
                    help="weak detection: adds 1 to the streak. Below this is ignored (Adi's LOW)")
     g.add_argument("--high-confidence", type=float, default=0.60,

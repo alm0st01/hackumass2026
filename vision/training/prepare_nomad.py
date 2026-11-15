@@ -178,7 +178,7 @@ def main():
 
     ann_path = os.path.join(args.nomad, "annotations", "annotations.json")
     if not os.path.exists(ann_path):
-        sys.exit(f"Missing {ann_path}. See adi/README.md for the download steps.")
+        sys.exit(f"Missing {ann_path}. See vision/README.md for the download steps.")
     with open(ann_path) as f:
         frames = {r["file_name"]: r for r in json.load(f)}
 

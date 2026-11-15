@@ -8,12 +8,12 @@ Dataset layout (one folder per class, any image size, jpg/png):
 --data, --val-data and --test-data each accept several folders (for example SARD and NOMAD).
 Training mixes them at random; test scores are reported for each folder and combined.
 
-Outputs in --out (default: adi/model):
+Outputs in --out (default: vision/model):
     model.keras        Keras model (for retraining / inspection)
-    model.onnx         model used by adi/camera/target_camera.cpp
+    model.onnx         model used by vision/camera/target_camera.cpp
     model_info.json    input size and default threshold, read by the C++ app
 
-See adi/README.md for full instructions.
+See vision/README.md for full instructions.
 """
 import argparse
 import json

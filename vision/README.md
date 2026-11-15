@@ -23,8 +23,8 @@ download is a Roboflow export (`sard-8xjhy`, version 17, "TILES_3x3"):
 https://universe.roboflow.com/datasets-pdabr/sard-8xjhy
 
 - 5755 aerial images, 640×640, with people labeled as `human` in YOLOv8 format.
-- It's 821 MB, so it is **not committed**. `adi/search-and-rescue/` is in `.gitignore`.
-  Download it from Kaggle and unzip it so you have `adi/search-and-rescue/train/`,
+- It's 821 MB, so it is **not committed**. `vision/search-and-rescue/` is in `.gitignore`.
+  Download it from Kaggle and unzip it so you have `vision/search-and-rescue/train/`,
   `valid/`, `test/`, and `data.yaml`.
 
 SARD labels boxes around people, but the classifier only needs "person in the image or not".
@@ -33,7 +33,7 @@ SARD labels boxes around people, but the classifier only needs "person in the im
 disk space is used.
 
 ```sh
-cd adi
+cd vision
 python training/prepare_yolo.py --yolo search-and-rescue --out search-and-rescue/classification
 ```
 
@@ -53,12 +53,12 @@ walking, lying down, and hiding. It includes 42,825 annotated frames at 5472×30
 person box and a visibility level (10–100% of the body visible), plus 500 "true negative"
 scenes with nobody in them.
 
-If you use it, cite the authors (BibTeX is in `adi/NOMAD/README.md`): Russell Bernal,
+If you use it, cite the authors (BibTeX is in `vision/NOMAD/README.md`): Russell Bernal,
 Scheirer, Cleland-Huang, "NOMAD: A Natural, Occluded, Multi-Scale Aerial Dataset, for
 Emergency Response Scenarios", WACV 2024.
 
-**Where it lives.** The repo is cloned into `adi/NOMAD/` and the downloaded data goes in
-`adi/NOMAD/data/`. The whole folder is in `.gitignore`.
+**Where it lives.** The repo is cloned into `vision/NOMAD/` and the downloaded data goes in
+`vision/NOMAD/data/`. The whole folder is in `.gitignore`.
 
 **Downloading.** The images are only on Google Drive, as 10 zip files totaling about 290 GB.
 Drive blocked every one of those zips with "quota exceeded", and it began blocking single
@@ -67,7 +67,7 @@ the empty scenes), and a sample of frames, by default 12 per actor and distance 
 10, 30, and 50 m distances:
 
 ```sh
-cd adi
+cd vision
 git clone https://github.com/ArtRuss/NOMAD.git NOMAD
 python training/download_nomad.py --out NOMAD/data
 ```
@@ -131,7 +131,7 @@ probability of `target`.
 Requires Python 3.9–3.12 (TensorFlow doesn't support 3.13+ yet).
 
 ```sh
-cd adi/training
+cd vision/training
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -139,7 +139,7 @@ pip install -r requirements.txt
 python train.py --data /path/to/dataset
 ```
 
-For SARD, use its own validation and test splits (run from `adi/`):
+For SARD, use its own validation and test splits (run from `vision/`):
 
 ```sh
 python training/train.py \
@@ -161,7 +161,7 @@ python training/train.py \
 
 Either command takes a few minutes on a laptop CPU (about 10 s per epoch on an M-series Mac).
 
-Output goes to `adi/model/`:
+Output goes to `vision/model/`:
 
 | File | Used by |
 |---|---|
@@ -188,7 +188,7 @@ Output goes to `adi/model/`:
 | Option | Default | Notes |
 |---|---|---|
 | `--data` | (required) | one or more dataset folders |
-| `--out` | `adi/model` | output folder |
+| `--out` | `vision/model` | output folder |
 | `--img-size` | 224 | MobileNetV2 accepts 96, 128, 160, 192, 224. Smaller is faster on the laptop, less accurate. |
 | `--batch-size` | 32 | lower it if you run out of memory |
 | `--epochs` | 10 | stage 1 |
@@ -238,16 +238,16 @@ Requires OpenCV 4.x or 5.x with the `dnn` module, and CMake.
 brew install opencv cmake            # macOS
 # sudo apt install libopencv-dev cmake   # Ubuntu
 
-cd adi/camera
+cd vision/camera
 cmake -S . -B build
 cmake --build build
 ```
 
-Run from the repo root (the default model path is `adi/model/model.onnx`):
+Run from the repo root (the default model path is `vision/model/model.onnx`):
 
 ```sh
-adi/camera/build/target_camera --list        # find the Logitech camera's index
-adi/camera/build/target_camera --camera 1    # usually 1 on a laptop; 0 is the built-in camera
+vision/camera/build/target_camera --list        # find the Logitech camera's index
+vision/camera/build/target_camera --camera 1    # usually 1 on a laptop; 0 is the built-in camera
 ```
 
 A window shows the camera with a green border when the target is found and red when it isn't.
@@ -262,7 +262,7 @@ TARGET_LOST p=0.21
 |---|---|---|
 | `--camera N` | 0 | camera index |
 | `--source PATH` | | image, video, or image sequence (`frames/f_%03d.jpg`) instead of a camera |
-| `--model PATH` | `adi/model/model.onnx` | |
+| `--model PATH` | `vision/model/model.onnx` | |
 | `--info PATH` | `model_info.json` next to the model | |
 | `--threshold T` | from `model_info.json` | |
 | `--smooth N` | 5 | averages the last N frames so one bad frame doesn't trigger it |
@@ -286,9 +286,9 @@ on the same labeled images. The model uses exactly the camera app's preprocessin
 "found" means `detectMultiScale` returned at least one person.
 
 ```sh
-cmake --build adi/camera/build
-adi/camera/build/compare_detectors --model adi/model/model.onnx --threshold 0.7 \
-  adi/search-and-rescue/classification/test adi/NOMAD/classification/test
+cmake --build vision/camera/build
+vision/camera/build/compare_detectors --model vision/model/model.onnx --threshold 0.7 \
+  vision/search-and-rescue/classification/test vision/NOMAD/classification/test
 # add --hog-upscale 2 to enlarge images before HOG
 ```
 

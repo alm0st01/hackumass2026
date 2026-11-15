@@ -13,7 +13,7 @@ It copies the ESP32 firmware's safety (integration/firmware/main.cpp) with a bac
   - motors stop if drive() isn't called for COMMAND_TIMEOUT_S ("TIMEOUT")
   - forward driving stops while the obstacle sensor sees something ("OBSTACLE");
     turning in place and reversing are still allowed
-Wiring and setup: alan/pi/README.md
+Wiring and setup: drive/pi/README.md
 """
 import atexit
 import signal
@@ -32,7 +32,7 @@ RIGHT_IN1 = 20    # [38] L298N IN3
 RIGHT_IN2 = 21    # [40] L298N IN4
 OBSTACLE_PIN = None  # digital IR obstacle module, e.g. 17 [11]. None = no sensor.
 
-# Same meaning as shared/config.h and alan/control/motors.cpp; tune once the robot is built.
+# Same meaning as shared/config.h and drive/control/motors.cpp; tune once the robot is built.
 MOTOR_MIN_PWM = 90       # lowest PWM that still turns the wheels
 MOTOR_MAX_PWM = 255
 INVERT_LEFT = False      # flip if that side drives backwards

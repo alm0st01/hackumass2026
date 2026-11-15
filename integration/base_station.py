@@ -1,4 +1,4 @@
-"""Piku's base station (piku/meshtastic-testing/base.py), plus robot positions.
+"""Piku's base station (comms/meshtastic-testing/base.py), plus robot positions.
 
 Same commands and options as base.py:
     python integration/base_station.py            (real radio, add --port if needed)
@@ -18,7 +18,7 @@ import sys
 import threading
 import time
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "piku", "meshtastic-testing"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "comms", "meshtastic-testing"))
 
 import base as piku_base  # noqa: E402  (Piku's code)
 from base import COMMANDS, Base  # noqa: E402
