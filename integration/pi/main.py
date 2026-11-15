@@ -9,7 +9,7 @@ Ties together:
 States (sent to the base in every heartbeat):
   IDLE         waiting for SCAN or RESUME from the base (or starts right away with --autostart)
   EXPLORING    following the search pattern; detours around obstacles the ESP32 reports
-  FOUND        target seen in --confirm-frames frames in a row: stops and reports it. RESUME continues.
+  FOUND        target confirmed (Adi's two-tier streak, see check_vision): stops and reports it. RESUME continues.
   SEARCH_DONE  reached the end of the pattern
   RETURNING    after HOME: drives back to the start point, then STOPPED
   STOPPED      after STOP, or when back home
@@ -85,8 +85,13 @@ def parse_args():
     g.add_argument("--vision", choices=["person", "apriltag", "none"], default="person")
     g.add_argument("--tag-id", type=int, default=0, help="AprilTag ID to look for (--vision apriltag)")
     g.add_argument("--camera", default="0", help="camera index, or a video file for testing")
-    g.add_argument("--min-confidence", type=float, default=0.6, help="person detector threshold")
-    g.add_argument("--confirm-frames", type=int, default=5, help="frames in a row needed to count as found")
+    # Same two-tier confirmation as adi/yolo-and-tags/person.py
+    g.add_argument("--min-confidence", type=float, default=0.35,
+                   help="weak detection: adds 1 to the streak. Below this is ignored (Adi's LOW)")
+    g.add_argument("--high-confidence", type=float, default=0.60,
+                   help="strong detection: adds 2 to the streak (Adi's HIGH)")
+    g.add_argument("--confirm-frames", type=int, default=10,
+                   help="streak points needed to confirm (Adi's CONFIRM_FRAMES). A frame without a detection takes 1 off")
 
     p.add_argument("--autostart", action="store_true", help="start the search without waiting for SCAN from the base")
     args = p.parse_args()
@@ -179,10 +184,12 @@ class RobotBrain:
         if result is None or result.frame == self.last_frame:
             return  # no new frame since last time
         self.last_frame = result.frame
+        # Adi's two-tier streak: strong detections count double, weak ones once, and a miss
+        # only takes 1 off, so a flickering detection on a moving robot still adds up.
         if result.box is None:
-            self.streak = 0
+            self.streak = max(0, self.streak - 1)
             return
-        self.streak += 1
+        self.streak += 2 if result.confidence >= self.args.high_confidence else 1
         if self.streak >= self.args.confirm_frames and self.state == "EXPLORING":
             self.remember_progress()
             self.nav.follow([])

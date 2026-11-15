@@ -41,10 +41,12 @@ class Robot(Node):
         self.last_detection = 0
         self.started = time.time()
         self.commands = []  # commands from the base, waiting for the motor code
+        self.undelivered = []  # detections the base never confirmed; resent after reconnecting
 
         # status sent in each heartbeat
         self.battery = 100
         self.state = "IDLE"
+        self.last_sent_state = None
         self.heading = 0
 
     def update(self):
@@ -55,6 +57,10 @@ class Robot(Node):
                 self.connected = True
                 self.heartbeat_every = msg["heartbeat_every"]
                 print(f"[robot {self.my_id}] connected to base")
+                for old in self.undelivered:
+                    print(f"[robot {self.my_id}] resending a detection the base missed")
+                    Node.send(self, old, needs_ack=True)  # Node.send, so the original position is kept
+                self.undelivered = []
             elif msg["type"] == "COMMAND":
                 print(f"[robot {self.my_id}] got command {msg['command']}")
                 self.commands.append(msg["command"])
@@ -65,12 +71,15 @@ class Robot(Node):
             self.send({"type": "HELLO", "to": BASE_ID})
             self.last_hello = now
 
-        # Once connected, send a heartbeat every few seconds.
-        if self.connected and now - self.last_heartbeat > self.heartbeat_every:
+        # Once connected, send a heartbeat every few seconds, and right away when the state
+        # changes (e.g. after a STOP), so the base doesn't show the old state for 10 s.
+        state_changed = self.state != self.last_sent_state
+        if self.connected and (now - self.last_heartbeat > self.heartbeat_every or state_changed):
             self.send({"type": "HEARTBEAT", "to": BASE_ID, "battery": self.battery,
                        "state": self.state, "heading": self.heading,
                        "uptime": int(now - self.started)})
             self.last_heartbeat = now
+            self.last_sent_state = self.state
 
         self.resend_unacked()
 
@@ -94,6 +103,8 @@ class Robot(Node):
 
     def gave_up(self, msg):
         print(f"[robot {self.my_id}] base never confirmed {msg['type']}, reconnecting")
+        if msg["type"] == "DETECTION":
+            self.undelivered.append(msg)  # never drop a found person
         self.connected = False
 
 
