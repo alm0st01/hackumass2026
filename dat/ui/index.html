@@ -32,37 +32,42 @@
         </section>
 
 
-        <!-- Camera Feed -->
+        <!-- Camera Frame: where the target was in the robot's camera picture.
+             Live video can't go over LoRa, so this draws the box from the DETECTION message. -->
         <section class="card camera-card">
-            <h2>Camera Feed</h2>
+            <h2>Robot Camera</h2>
 
             <div class="camera">
-                <video id="camera-video" autoplay muted playsinline></video>
+                <div id="camera-frame">
+                    <div id="camera-placeholder">
+                        No detection yet
+                    </div>
 
-                <div id="camera-placeholder">
-                    Camera feed will appear here
+                    <div id="detection-box">
+                        <span id="detection-box-label"></span>
+                    </div>
                 </div>
 
-                <span id="camera-status">OFFLINE</span>
+                <span id="camera-status">NO VIDEO</span>
             </div>
 
-            <div class="camera-controls">
-                <button id="start-camera-btn">Start Camera</button>
-                <button id="stop-camera-btn">Stop Camera</button>
-            </div>
+            <p class="camera-note">
+                Live video can't be sent over the LoRa radio. The box shows where the target was
+                in the robot's 640×480 camera picture when it was found.
+            </p>
         </section>
-        <!-- AprilTag Detection -->
+        <!-- Target Detection (person or AprilTag, from the robot over the radio) -->
 
         <section class="card">
-            <h2>AprilTag Detection</h2>
+            <h2>Target Detection</h2>
 
             <div class="detection-info">
                 <p>Status: <span id="detection-status">Not Detected</span></p>
-                <p>Tag ID: <span id="tag-id">--</span></p>
-                <p>Distance: <span id="tag-distance">--</span></p>
+                <p>Robot: <span id="detection-robot">--</span></p>
+                <p>Confidence: <span id="detection-confidence">--</span></p>
+                <p>Position: <span id="detection-position">--</span></p>
+                <p>Last seen: <span id="detection-time">--</span></p>
             </div>
-
-            <button id="detect-btn">Simulate Detection</button>
         </section>
 
 

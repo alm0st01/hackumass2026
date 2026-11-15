@@ -44,7 +44,7 @@ header p {
 }
 
 .camera {
-    height: 550px;
+    padding: 20px;
     width: 100%;
     background-color: #030712;
     position: relative;
@@ -60,20 +60,46 @@ header p {
     grid-column: span 2;
 }
 
-/* Video Display */
-#camera-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: none;
-    transform: scaleX(-1);
+/* Outline of the robot's 640x480 camera picture */
+#camera-frame {
+    position: relative;
+    width: min(100%, 640px);
+    aspect-ratio: 4 / 3;
+    border: 1px dashed #374151;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Camera Placeholder */
 #camera-placeholder {
-    position: absolute;
     color: #9ca3af;
     font-size: 16px;
+}
+
+/* Where the target was; position and size are set from the DETECTION box */
+#detection-box {
+    position: absolute;
+    display: none;
+    border: 3px solid #22c55e;
+}
+
+#detection-box-label {
+    position: absolute;
+    bottom: 100%;
+    left: -3px;
+    background-color: #22c55e;
+    color: #030712;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 6px;
+    white-space: nowrap;
+}
+
+.camera-note {
+    margin-top: 12px;
+    color: #9ca3af;
+    font-size: 14px;
 }
 
 /* Camera Status */
@@ -150,16 +176,16 @@ button {
 }
 
 #detection-status {
-    color: #22c55e;
+    color: #9ca3af;
     font-weight: bold;
 }
-#detect-btn {
-    padding: 10px 16px;
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+
+#detection-status.detected {
+    color: #22c55e;
+}
+
+.detection-info p {
+    margin-bottom: 6px;
 }
 
 
@@ -185,17 +211,3 @@ button {
     margin-top: 15px;
 }
 
-/* Camera Controls */
-.camera-controls {
-    margin-top: 15px;
-}
-
-#start-camera-btn {
-    background-color: #16a34a;
-    color: white;
-}
-
-#stop-camera-btn {
-    background-color: #dc2626;
-    color: white;
-}
