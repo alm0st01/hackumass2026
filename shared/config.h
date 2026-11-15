@@ -32,7 +32,9 @@ const int PIN_DISTANCE  = 1;     // analog (ADC1)
 const int PIN_IMU_SDA   = 39;    // MPU6050 I2C data  (39/40 are SD-card pins; no SD card used)
 const int PIN_IMU_SCL   = 40;    // MPU6050 I2C clock
 #else
-// Regular ESP32 (final robots)
+// Regular ESP32 (final robots). Assumes an ESP32-WROOM board (most "ESP32 DevKit"
+// boards): on WROVER boards GPIO 16/17 are taken by PSRAM, so move RIGHT_IN1/IN2.
+// Only use GPIO 34-39 as inputs; they can't drive the motor driver.
 const int PIN_LEFT_EN   = 25;
 const int PIN_LEFT_IN1  = 26;
 const int PIN_LEFT_IN2  = 27;

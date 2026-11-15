@@ -10,3 +10,4 @@ __pycache__/
 yolov8n.pt
 
 adi/yolo-and-tags/raw
+drive_sim
